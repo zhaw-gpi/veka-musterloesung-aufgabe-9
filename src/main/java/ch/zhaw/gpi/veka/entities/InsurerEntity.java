@@ -37,6 +37,7 @@ public class InsurerEntity implements Serializable {
     
 
     // GETTER und SETTER
+    // Bei Id sicher nicht besonders elegant, dass diese Datenbank-Id nach aussen gegeben wird und erst recht nicht, dass sie geändert werden kann
     public Long getId() {
         return id;
     }

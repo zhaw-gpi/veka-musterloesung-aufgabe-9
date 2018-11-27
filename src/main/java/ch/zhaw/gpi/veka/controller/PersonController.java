@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Geschäftslogik und REST-Schnittstelle im Zusammenhang mit versicherten Personen
+ * 
  * @author scep
  */
 @RestController
@@ -28,14 +29,14 @@ public class PersonController {
     private AddressRepository addressRepository;
     
     /**
-     * Zu einer PersonenId mit als JSON übergebener Adresse die (angepasste) Person oder eine Nicht-Gefunden-Status zurück geben
+     * Einer Person mit einer übergebenen PersonenId die im JSON-Format übergebene Adresse zuweisen
      * 
      * @param newAddress        Die neue Adresse
      * @param id                Id der Person
-     * @return ResponseEntity   Nicht-Gefunden-Status, falls Person nicht vorhanden, Person mit neuer Adresse ansonsten
+     * @return ResponseEntity   Nicht-Gefunden-Status (404), falls Person nicht vorhanden, ansonsten OK-Status (200)
      */
     @RequestMapping(method = RequestMethod.PUT, value = "/vekaapi/v1/persons/{id}/address")
-    public ResponseEntity<PersonEntity> updateAddress(@RequestBody AddressEntity newAddress, @PathVariable Long id){
+    public ResponseEntity updateAddress(@RequestBody AddressEntity newAddress, @PathVariable Long id){
         // Person über die Id im Repository suchen
         Optional<PersonEntity> person = personRepository.findById(id);
         
@@ -49,8 +50,8 @@ public class PersonController {
         // Hinweis: Umständlich gelöst hier im Controller. Sauberer wäre natürlich, wenn man in AddressEntity einen Override der equals- und hashCode-Methoden macht, wie z.B. beschrieben in https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/. Dann würde man sinnvollerweise aber eine andere Id wählen, die wirklich eindeutig ist, in der Schweiz z.B. die Id für Hauseingänge. Auch eine einigermassen sauberere Lösung wäre, eine compareTo-Methode in der Entity hinzuzufügen. Eine weitere Variante ist, über eine neue findByPlzAndStreetAndHouseNumber-Methodendeklaration im AddressRepository nach der neuen Adresse zu suchen und dann zu schauen, ob sie mit der alten Adresse übereinstimmt.
         AddressEntity oldAddress = person.get().getAddressPostal();
         if(oldAddress.getPlz() == newAddress.getPlz() && oldAddress.getStreet().equals(newAddress.getStreet()) && oldAddress.getHouseNumber().equals(newAddress.getHouseNumber())){
-            // Falls ja, dann die Person unverändert zurückgeben
-            return new ResponseEntity(person.get(), HttpStatus.OK);
+            // Falls ja, dann OK-Status zurückgeben
+            return new ResponseEntity(HttpStatus.OK);
         }
 
         // Im Repository nach der neuen Adresse suchen
@@ -77,7 +78,7 @@ public class PersonController {
             addressRepository.delete(oldAddress);
         }
         
-        // Die veränderte Person zurück geben
-        return new ResponseEntity(person.get(), HttpStatus.OK);
+        // OK-Status zurück geben
+        return new ResponseEntity(HttpStatus.OK);
     }
 }

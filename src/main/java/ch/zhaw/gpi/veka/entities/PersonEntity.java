@@ -36,6 +36,8 @@ public class PersonEntity implements Serializable {
     @ManyToOne
     private AddressEntity addressPostal;
 
+    // GETTER und SETTER
+    // Bei Id sicher nicht besonders elegant, dass diese Datenbank-Id nach aussen gegeben wird und erst recht nicht, dass sie geändert werden kann
     public long getId() {
         return id;
     }
